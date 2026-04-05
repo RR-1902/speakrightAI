@@ -92,6 +92,33 @@ The Vite dev server runs on `http://127.0.0.1:5173` and proxies `/api/*` request
 
 If you want to call a different backend host, copy `frontend/.env.example` to `frontend/.env` and set `VITE_API_BASE_URL`.
 
+## Docker
+
+This project includes Docker support for both backend and frontend.
+
+### Files
+
+- `Dockerfile.backend`
+- `frontend/Dockerfile`
+- `docker-compose.yml`
+
+### Run with Docker Compose
+
+```bash
+docker compose up --build
+```
+
+### Services
+
+- Backend: `http://localhost:8000`
+- Frontend: `http://localhost:5173`
+
+### Notes
+
+- The backend container installs `ffmpeg`, Python dependencies, and downloads NLTK `cmudict`.
+- The frontend container builds the Vite app with `VITE_API_BASE_URL=http://backend:8000`.
+- In this Docker setup, the frontend service is configured to target `http://backend:8000` as requested.
+
 ## Endpoints
 
 - `GET /health`
