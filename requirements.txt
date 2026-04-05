@@ -1,0 +1,6 @@
+fastapi==0.115.12
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+openai-whisper==20231117
+pydantic-settings==2.8.1
+nltk==3.9.1
