@@ -11,6 +11,14 @@ Repository:
 
 - [RR-1902/speakrightAI](https://github.com/RR-1902/speakrightAI)
 
+Live frontend:
+
+- [https://speakright-ai.vercel.app/](https://speakright-ai.vercel.app/)
+
+Backend:
+
+- Render deployment in progress
+
 Local project path:
 
 - [C:\Users\vtr96\OneDrive\Documents\New project](/C:/Users/vtr96/OneDrive/Documents/New%20project)
@@ -137,7 +145,7 @@ APP_ENV=production
 WHISPER_MODEL=tiny
 WHISPER_DEVICE=cpu
 MAX_UPLOAD_SIZE_MB=25
-CORS_ORIGINS=https://your-frontend.vercel.app
+CORS_ORIGINS=https://speakright-ai.vercel.app
 ```
 
 ### Frontend
@@ -203,7 +211,7 @@ APP_ENV=production
 WHISPER_MODEL=tiny
 WHISPER_DEVICE=cpu
 MAX_UPLOAD_SIZE_MB=25
-CORS_ORIGINS=https://your-frontend.vercel.app
+CORS_ORIGINS=https://speakright-ai.vercel.app
 ```
 
 ### Step 6. Deploy
@@ -289,10 +297,10 @@ VITE_API_BASE_URL=https://speakrightai-backend.onrender.com
 
 Click `Deploy`.
 
-Your frontend URL will look like:
+Your live frontend URL is:
 
 ```bash
-https://speakrightai.vercel.app
+https://speakright-ai.vercel.app/
 ```
 
 ### Step 7. Final CORS check
@@ -300,7 +308,7 @@ https://speakrightai.vercel.app
 Go back to Render and confirm:
 
 ```bash
-CORS_ORIGINS=https://your-frontend.vercel.app
+CORS_ORIGINS=https://speakright-ai.vercel.app
 ```
 
 If you changed it, save and redeploy the backend.
@@ -350,7 +358,7 @@ Check:
 
 Fix:
 
-- set backend `CORS_ORIGINS=https://your-frontend.vercel.app`
+- set backend `CORS_ORIGINS=https://speakright-ai.vercel.app`
 - redeploy backend
 
 ### 4. Whisper is slow on first request
