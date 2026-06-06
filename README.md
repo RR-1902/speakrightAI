@@ -17,7 +17,7 @@ Live frontend:
 
 Backend:
 
-- Render deployment in progress
+- [https://speakrightai.onrender.com](https://speakrightai.onrender.com)
 
 Local project path:
 
@@ -151,7 +151,7 @@ CORS_ORIGINS=https://speakright-ai.vercel.app
 ### Frontend
 
 ```bash
-VITE_API_BASE_URL=https://your-backend.onrender.com
+VITE_API_BASE_URL=https://speakrightai.onrender.com
 ```
 
 ---
@@ -228,18 +228,18 @@ Render will:
 
 ### Step 7. Test backend
 
-After deploy, Render gives a URL like:
+The live backend URL is:
 
 ```bash
-https://speakrightai-backend.onrender.com
+https://speakrightai.onrender.com
 ```
 
 Test:
 
-- `https://your-backend.onrender.com/health`
-- `https://your-backend.onrender.com/docs`
+- `https://speakrightai.onrender.com/health`
+- `https://speakrightai.onrender.com/docs`
 
-Save this backend URL. You need it for Vercel.
+Use this backend URL for Vercel.
 
 ---
 
@@ -284,13 +284,13 @@ frontend
 ### Step 5. Add environment variable
 
 ```bash
-VITE_API_BASE_URL=https://your-backend.onrender.com
+VITE_API_BASE_URL=https://speakrightai.onrender.com
 ```
 
 Example:
 
 ```bash
-VITE_API_BASE_URL=https://speakrightai-backend.onrender.com
+VITE_API_BASE_URL=https://speakrightai.onrender.com
 ```
 
 ### Step 6. Deploy
