@@ -81,8 +81,6 @@ Request flow:
 
 ### Backend
 
-From [C:\Users\vtr96\OneDrive\Documents\New project](/C:/Users/vtr96/OneDrive/Documents/New%20project):
-
 ```bash
 python -m venv .venv
 .venv\Scripts\activate
@@ -105,7 +103,6 @@ Important:
 
 ### Frontend
 
-From [C:\Users\vtr96\OneDrive\Documents\New project\frontend](/C:/Users/vtr96/OneDrive/Documents/New%20project/frontend):
 
 ```bash
 npm install
@@ -148,185 +145,17 @@ VITE_API_BASE_URL=https://speakrightai.onrender.com
 
 ---
 
-## Deploy Backend To Render
-
-Use these files:
-
-- [Dockerfile.backend](/C:/Users/vtr96/OneDrive/Documents/New%20project/Dockerfile.backend)
-- [render.yaml](/C:/Users/vtr96/OneDrive/Documents/New%20project/render.yaml)
 
 Official docs:
 
 - [Render Web Services](https://render.com/docs/web-services/)
 - [Render Docker](https://render.com/docs/docker)
 
-### Step 1. Push code to GitHub
-
-Push your latest code to:
-
-- [RR-1902/speakrightAI](https://github.com/RR-1902/speakrightAI)
-
-### Step 2. Open Render
-
-Go to:
-
-- [https://render.com](https://render.com)
-
-### Step 3. Create Web Service
-
-In Render:
-
-1. click `New +`
-2. click `Web Service`
-3. connect GitHub
-4. choose `RR-1902/speakrightAI`
-
-### Step 4. Fill the form
-
-Use these values:
-
-| Field | Value |
-|---|---|
-| Name | `speakrightai-backend` |
-| Runtime | `Docker` |
-| Branch | `main` |
-| Root Directory | leave empty |
-| Dockerfile Path | `Dockerfile.backend` |
-| Health Check Path | `/health` |
-
-### Step 5. Add environment variables
-
-Add:
-
-```bash
-APP_ENV=production
-WHISPER_MODEL=tiny
-WHISPER_DEVICE=cpu
-MAX_UPLOAD_SIZE_MB=25
-CORS_ORIGINS=https://speakright-ai.vercel.app
-```
-
-### Step 6. Deploy
-
-Click `Create Web Service`.
-
-Render will:
-
-- build the backend image
-- install FFmpeg
-- install Python packages
-- download NLTK `cmudict`
-- start FastAPI
-
-### Step 7. Test backend
-
-The live backend URL is:
-
-```bash
-https://speakrightai.onrender.com
-```
-
-Test:
-
-- `https://speakrightai.onrender.com/health`
-- `https://speakrightai.onrender.com/docs`
-
-Use this backend URL for Vercel.
-
----
-
-## Deploy Frontend To Vercel
-
 Official docs:
 
 - [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite)
 - [Vercel Environment Variables](https://vercel.com/docs/projects/environment-variables)
 
-### Step 1. Open Vercel
-
-Go to:
-
-- [https://vercel.com](https://vercel.com)
-
-### Step 2. Create Project
-
-In Vercel:
-
-1. click `Add New`
-2. click `Project`
-3. import `RR-1902/speakrightAI`
-
-### Step 3. Set root directory
-
-Set:
-
-```bash
-frontend
-```
-
-### Step 4. Confirm build settings
-
-| Field | Value |
-|---|---|
-| Framework Preset | `Vite` |
-| Root Directory | `frontend` |
-| Build Command | `npm run build` |
-| Output Directory | `dist` |
-
-### Step 5. Add environment variable
-
-```bash
-VITE_API_BASE_URL=https://speakrightai.onrender.com
-```
-
-Example:
-
-```bash
-VITE_API_BASE_URL=https://speakrightai.onrender.com
-```
-
-### Step 6. Deploy
-
-Click `Deploy`.
-
-Your live frontend URL is:
-
-```bash
-https://speakright-ai.vercel.app/
-```
-
-### Step 7. Final CORS check
-
-Go back to Render and confirm:
-
-```bash
-CORS_ORIGINS=https://speakright-ai.vercel.app
-```
-
-If you changed it, save and redeploy the backend.
-
----
-
-## Final Test
-
-After both deployments:
-
-1. open the Vercel frontend
-2. enter expected text
-3. upload or record audio
-4. click analyze
-5. verify results appear
-
-Expected output:
-
-- transcribed text
-- pronunciation score
-- grade
-- feedback
-- phoneme analysis
-- progress history
-
----
 
 ## Common Deployment Issues
 
@@ -358,14 +187,6 @@ Fix:
 This is normal on cold start, especially on free hosting.
 
 ---
-
-## Docker
-
-For local full-stack containers:
-
-- [Dockerfile.backend](/C:/Users/vtr96/OneDrive/Documents/New%20project/Dockerfile.backend)
-- [frontend/Dockerfile](/C:/Users/vtr96/OneDrive/Documents/New%20project/frontend/Dockerfile)
-- [docker-compose.yml](/C:/Users/vtr96/OneDrive/Documents/New%20project/docker-compose.yml)
 
 Run:
 
