@@ -1,6 +1,11 @@
 # SpeakRightAI
 
-SpeakRightAI is a full-stack AI pronunciation coach built to help users practice spoken English with AI-generated transcription, phoneme-aware feedback, scoring, and progress tracking.
+AI-powered pronunciation coach with:
+
+- speech-to-text using Whisper
+- phoneme-level pronunciation analysis
+- pronunciation scoring and grading
+- progress tracking across attempts
 
 Repository:
 
@@ -12,21 +17,47 @@ Local project path:
 
 ---
 
-## Overview
+## Deploy Fast
 
-The application allows a user to:
+Use this production setup:
 
-1. enter an expected sentence
-2. record audio or upload an audio file
-3. transcribe speech using Whisper
-4. compare expected text with spoken output
-5. detect phoneme-level pronunciation issues
-6. generate a pronunciation score and grade
-7. track progress across attempts
+- Backend -> Render
+- Frontend -> Vercel
+
+Deploy order:
+
+1. deploy backend on Render
+2. copy backend URL
+3. deploy frontend on Vercel
+4. set `VITE_API_BASE_URL` to the Render backend URL
+5. set backend `CORS_ORIGINS` to the Vercel frontend URL
 
 ---
 
-## Tech Stack
+## Architecture
+
+```mermaid
+flowchart LR
+    A["User"] --> B["React Frontend<br/>Vercel"]
+    B -->|POST audio + expected_text + session_id| C["FastAPI Backend<br/>Render"]
+    C --> D["Whisper"]
+    C --> E["Phoneme Analysis"]
+    C --> F["Scoring + Feedback"]
+    F --> B
+```
+
+Request flow:
+
+1. user records or uploads audio
+2. frontend sends audio to backend
+3. backend transcribes audio with Whisper
+4. backend compares text and phonemes
+5. backend returns score, grade, feedback, and history
+6. frontend displays results
+
+---
+
+## Stack
 
 ### Frontend
 
@@ -46,69 +77,9 @@ The application allows a user to:
 
 ---
 
-## Project Structure
+## Local Run
 
-```text
-SpeakRightAI/
-|-- app/
-|   |-- api/routes/
-|   |   |-- health.py
-|   |   `-- speech.py
-|   |-- core/config.py
-|   |-- models/speech.py
-|   |-- services/comparison.py
-|   |-- services/phoneme.py
-|   |-- services/scoring.py
-|   |-- services/transcription.py
-|   `-- main.py
-|-- frontend/
-|   |-- src/
-|   |-- package.json
-|   |-- vite.config.js
-|   `-- Dockerfile
-|-- Dockerfile.backend
-|-- docker-compose.yml
-|-- render.yaml
-|-- requirements.txt
-`-- README.md
-```
-
----
-
-## How It Works
-
-### Backend flow
-
-1. frontend sends `file`, `expected_text`, and `session_id`
-2. backend receives the request at `POST /api/v1/speech/transcribe`
-3. Whisper converts audio to text
-4. text comparison calculates similarity
-5. phoneme service converts words to phoneme sequences
-6. scoring service computes:
-   - similarity score
-   - pronunciation score
-   - grade
-   - feedback
-7. session tracker stores attempt history in memory
-
-### Frontend flow
-
-1. user enters expected text
-2. user uploads audio or records with the microphone
-3. frontend sends the request to the backend
-4. frontend displays:
-   - transcribed text
-   - pronunciation score
-   - grade
-   - phoneme analysis
-   - feedback
-   - previous scores
-
----
-
-## Run Locally
-
-### Backend setup
+### Backend
 
 From [C:\Users\vtr96\OneDrive\Documents\New project](/C:/Users/vtr96/OneDrive/Documents/New%20project):
 
@@ -118,17 +89,6 @@ python -m venv .venv
 pip install --upgrade pip
 pip install -r requirements.txt
 python -m nltk.downloader cmudict
-```
-
-Important:
-
-- `ffmpeg` must be installed and available in your system PATH
-- Whisper depends on PyTorch
-- on Windows, always use a clean virtual environment
-
-### Run backend
-
-```bash
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
@@ -138,7 +98,12 @@ Backend URLs:
 - Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 - Health: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
 
-### Frontend setup
+Important:
+
+- `ffmpeg` must be installed and available in PATH
+- use a clean virtual environment on Windows
+
+### Frontend
 
 From [C:\Users\vtr96\OneDrive\Documents\New project\frontend](/C:/Users/vtr96/OneDrive/Documents/New%20project/frontend):
 
@@ -157,13 +122,9 @@ Frontend URL:
 
 ### Backend
 
-Copy [.env.example](/C:/Users/vtr96/OneDrive/Documents/New%20project/.env.example) to `.env` if needed.
+Supported:
 
-Supported backend variables:
-
-- `APP_NAME`
 - `APP_ENV`
-- `API_V1_PREFIX`
 - `WHISPER_MODEL`
 - `WHISPER_DEVICE`
 - `MAX_UPLOAD_SIZE_MB`
@@ -172,69 +133,36 @@ Supported backend variables:
 Example:
 
 ```bash
-APP_ENV=development
+APP_ENV=production
 WHISPER_MODEL=tiny
 WHISPER_DEVICE=cpu
 MAX_UPLOAD_SIZE_MB=25
-CORS_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
+CORS_ORIGINS=https://your-frontend.vercel.app
 ```
 
 ### Frontend
 
-The frontend uses:
-
-- `VITE_API_BASE_URL`
-
-Local example:
-
 ```bash
-VITE_API_BASE_URL=http://127.0.0.1:8000
+VITE_API_BASE_URL=https://your-backend.onrender.com
 ```
-
----
-
-## Recommended Production Deployment
-
-This project should be deployed like this:
-
-- Backend -> Render
-- Frontend -> Vercel
-
-This is the recommended setup for this stack.
-
-### Why not deploy the backend to Vercel or Netlify first?
-
-Because the backend depends on:
-
-- Whisper
-- PyTorch
-- FFmpeg
-- NLTK corpus data
-- uploaded audio processing
-
-That makes it much heavier than a simple serverless function deployment.
-
-Official references:
-
-- [Vercel Functions Limits](https://vercel.com/docs/functions/limitations/)
-- [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite)
-- [Netlify Functions Overview](https://docs.netlify.com/build/functions/overview)
 
 ---
 
 ## Deploy Backend To Render
 
-This section is written as a direct step-by-step guide.
+Use these files:
 
-Render docs used:
+- [Dockerfile.backend](/C:/Users/vtr96/OneDrive/Documents/New%20project/Dockerfile.backend)
+- [render.yaml](/C:/Users/vtr96/OneDrive/Documents/New%20project/render.yaml)
 
-- [Web Services](https://render.com/docs/web-services/)
-- [Docker on Render](https://render.com/docs/docker)
-- [Environment Variables and Secrets](https://render.com/docs/configure-environment-variables/)
+Official docs:
 
-### Step 1. Push your code to GitHub
+- [Render Web Services](https://render.com/docs/web-services/)
+- [Render Docker](https://render.com/docs/docker)
 
-Make sure your latest code is available in:
+### Step 1. Push code to GitHub
+
+Push your latest code to:
 
 - [RR-1902/speakrightAI](https://github.com/RR-1902/speakrightAI)
 
@@ -244,106 +172,75 @@ Go to:
 
 - [https://render.com](https://render.com)
 
-Sign in with your account.
+### Step 3. Create Web Service
 
-### Step 3. Create a new Web Service
-
-Inside Render:
+In Render:
 
 1. click `New +`
 2. click `Web Service`
-3. connect GitHub if Render asks for permission
-4. select:
-   - `RR-1902/speakrightAI`
+3. connect GitHub
+4. choose `RR-1902/speakrightAI`
 
-### Step 4. Fill the service form exactly like this
+### Step 4. Fill the form
 
 Use these values:
 
-- Name: `speakrightai-backend`
-- Region: choose the nearest region
-- Branch: `main`
-- Root Directory: leave empty
-- Runtime: `Docker`
-
-If Render asks for Dockerfile path, use:
-
-```bash
-Dockerfile.backend
-```
+| Field | Value |
+|---|---|
+| Name | `speakrightai-backend` |
+| Runtime | `Docker` |
+| Branch | `main` |
+| Root Directory | leave empty |
+| Dockerfile Path | `Dockerfile.backend` |
+| Health Check Path | `/health` |
 
 ### Step 5. Add environment variables
 
-In the Render environment section, add:
+Add:
 
 ```bash
 APP_ENV=production
 WHISPER_MODEL=tiny
 WHISPER_DEVICE=cpu
 MAX_UPLOAD_SIZE_MB=25
-CORS_ORIGINS=https://your-frontend-name.vercel.app
+CORS_ORIGINS=https://your-frontend.vercel.app
 ```
 
-Important:
+### Step 6. Deploy
 
-- replace `https://your-frontend-name.vercel.app` with your real Vercel URL after frontend deployment
+Click `Create Web Service`.
 
-### Step 6. Set health check path
+Render will:
 
-Set this field to:
+- build the backend image
+- install FFmpeg
+- install Python packages
+- download NLTK `cmudict`
+- start FastAPI
 
-```bash
-/health
-```
+### Step 7. Test backend
 
-### Step 7. Click Create Web Service
-
-Render will now:
-
-1. read [Dockerfile.backend](/C:/Users/vtr96/OneDrive/Documents/New%20project/Dockerfile.backend)
-2. install FFmpeg
-3. install Python dependencies
-4. download NLTK `cmudict`
-5. start FastAPI with Uvicorn
-
-### Step 8. Wait for deployment to complete
-
-When it succeeds, you will get a public URL like:
+After deploy, Render gives a URL like:
 
 ```bash
 https://speakrightai-backend.onrender.com
 ```
 
-### Step 9. Test the backend
-
-Open these URLs:
+Test:
 
 - `https://your-backend.onrender.com/health`
 - `https://your-backend.onrender.com/docs`
 
-Expected result:
-
-- `/health` should respond successfully
-- `/docs` should open Swagger UI
-
-### Step 10. Save the backend URL
-
-You will need it for Vercel.
-
-Example:
-
-```bash
-https://speakrightai-backend.onrender.com
-```
+Save this backend URL. You need it for Vercel.
 
 ---
 
 ## Deploy Frontend To Vercel
 
-Vercel docs used:
+Official docs:
 
 - [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite)
-- [Environment Variables](https://vercel.com/docs/projects/environment-variables)
+- [Vercel Environment Variables](https://vercel.com/docs/projects/environment-variables)
 
 ### Step 1. Open Vercel
 
@@ -351,18 +248,15 @@ Go to:
 
 - [https://vercel.com](https://vercel.com)
 
-### Step 2. Create a new project
+### Step 2. Create Project
 
-Inside Vercel:
+In Vercel:
 
 1. click `Add New`
 2. click `Project`
-3. import:
-   - `RR-1902/speakrightAI`
+3. import `RR-1902/speakrightAI`
 
-### Step 3. Set the root directory
-
-This is very important.
+### Step 3. Set root directory
 
 Set:
 
@@ -370,18 +264,16 @@ Set:
 frontend
 ```
 
-### Step 4. Confirm the build settings
+### Step 4. Confirm build settings
 
-Use:
+| Field | Value |
+|---|---|
+| Framework Preset | `Vite` |
+| Root Directory | `frontend` |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
 
-- Framework Preset: `Vite`
-- Root Directory: `frontend`
-- Build Command: `npm run build`
-- Output Directory: `dist`
-
-### Step 5. Add the frontend environment variable
-
-Set:
+### Step 5. Add environment variable
 
 ```bash
 VITE_API_BASE_URL=https://your-backend.onrender.com
@@ -397,85 +289,79 @@ VITE_API_BASE_URL=https://speakrightai-backend.onrender.com
 
 Click `Deploy`.
 
-After deployment, your frontend URL will look like:
+Your frontend URL will look like:
 
 ```bash
 https://speakrightai.vercel.app
 ```
 
-### Step 7. Update Render CORS if needed
+### Step 7. Final CORS check
 
-Now take your final Vercel production URL and make sure Render allows it.
-
-Your Render backend environment variable should be:
+Go back to Render and confirm:
 
 ```bash
-CORS_ORIGINS=https://your-frontend-name.vercel.app
+CORS_ORIGINS=https://your-frontend.vercel.app
 ```
 
-If needed:
-
-1. open the backend service in Render
-2. go to `Environment`
-3. update `CORS_ORIGINS`
-4. save changes
-5. redeploy
+If you changed it, save and redeploy the backend.
 
 ---
 
-## Final Production Test
+## Final Test
 
-After both are deployed:
+After both deployments:
 
 1. open the Vercel frontend
-2. enter an expected sentence
-3. upload audio or record audio
+2. enter expected text
+3. upload or record audio
 4. click analyze
-5. confirm the results appear correctly
+5. verify results appear
 
-You should see:
+Expected output:
 
 - transcribed text
 - pronunciation score
 - grade
-- phoneme analysis
 - feedback
+- phoneme analysis
 - progress history
 
 ---
 
-## Production Checklist
+## Common Deployment Issues
 
-### Backend
+### 1. Frontend loads but API calls fail
 
-- repo connected in Render
-- runtime set to Docker
-- `Dockerfile.backend` used
-- environment variables added
+Check:
+
+- `VITE_API_BASE_URL` is correct in Vercel
+- backend is awake on Render
+- `CORS_ORIGINS` matches the Vercel domain exactly
+
+### 2. Render deploy succeeds but backend does not respond
+
+Check:
+
 - `/health` works
-- `/docs` works
+- Render logs show Uvicorn started
+- `Dockerfile.backend` is being used
 
-### Frontend
+### 3. CORS error in browser
 
-- repo connected in Vercel
-- root directory set to `frontend`
-- `VITE_API_BASE_URL` set correctly
-- deploy completed successfully
+Fix:
 
-### Browser test
+- set backend `CORS_ORIGINS=https://your-frontend.vercel.app`
+- redeploy backend
 
-- frontend loads
-- backend health works
-- frontend can submit audio
-- results appear without CORS errors
+### 4. Whisper is slow on first request
+
+This is normal on cold start, especially on free hosting.
 
 ---
 
 ## Docker
 
-Docker support is included for local full-stack runs.
-
-Files:
+For local full-stack containers:
 
 - [Dockerfile.backend](/C:/Users/vtr96/OneDrive/Documents/New%20project/Dockerfile.backend)
 - [frontend/Dockerfile](/C:/Users/vtr96/OneDrive/Documents/New%20project/frontend/Dockerfile)
@@ -520,17 +406,17 @@ curl -X POST "http://127.0.0.1:8000/api/v1/speech/transcribe" \
 
 ## Current Limitations
 
-- session progress is stored in memory only
+- session tracking is in memory only
 - Whisper cold starts can be slow
 - CPU inference is slower than GPU inference
-- large uploads may take longer to process
+- large audio files take longer to process
 
 ---
 
-## Recommended Next Improvements
+## Next Improvements
 
-1. move progress tracking to a database
+1. move session history to a database
 2. add authentication
-3. store audio in cloud storage if needed
-4. add background job processing
-5. add custom production domains
+3. store audio in cloud storage
+4. add background jobs
+5. add custom domains
