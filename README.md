@@ -11,17 +11,9 @@ Repository:
 
 - [RR-1902/speakrightAI](https://github.com/RR-1902/speakrightAI)
 
-Live frontend:
+Live Link:
 
 - [https://speakright-ai.vercel.app/](https://speakright-ai.vercel.app/)
-
-Backend:
-
-- [https://speakrightai.onrender.com](https://speakrightai.onrender.com)
-
-Local project path:
-
-- [C:\Users\vtr96\OneDrive\Documents\New project](/C:/Users/vtr96/OneDrive/Documents/New%20project)
 
 ---
 
