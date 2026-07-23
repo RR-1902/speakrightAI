@@ -1,38 +1,37 @@
 # SpeakRightAI
 
-AI-powered pronunciation coach with:
+Real-time AI pronunciation coach with speech transcription, phoneme-level feedback, scoring, and session progress tracking.
 
-- speech-to-text using Whisper
-- phoneme-level pronunciation analysis
-- pronunciation scoring and grading
-- progress tracking across attempts
+## Live Links
 
-Repository:
+| Service | URL |
+|---|---|
+| Frontend | [https://speakright-ai.vercel.app/](https://speakright-ai.vercel.app/) |
+| Backend | [https://speakrightai.onrender.com](https://speakrightai.onrender.com) |
+| API Docs | [https://speakrightai.onrender.com/docs](https://speakrightai.onrender.com/docs) |
 
-- [RR-1902/speakrightAI](https://github.com/RR-1902/speakrightAI)
+## What It Does
 
-Live Link:
+SpeakRightAI helps users practice pronunciation by comparing what they intended to say with what they actually spoke. The user enters a target sentence, records speech through the browser microphone or uploads an audio file, and receives structured feedback from the backend.
 
-- [https://speakright-ai.vercel.app/](https://speakright-ai.vercel.app/)
+The backend transcribes the audio with OpenAI Whisper, normalizes the spoken and expected text, and calculates a similarity score. It then performs phoneme-level analysis using the NLTK CMU Pronouncing Dictionary so the feedback can go beyond simple text matching and identify sound-level pronunciation issues.
 
----
+The application returns a pronunciation score, grade, coaching feedback, transcribed text, phoneme breakdown, and previous attempt history. The frontend presents these results in a polished React interface with a score display, expandable phoneme analysis, and session-based progress tracking.
 
-## Deploy Fast
+Core capabilities:
 
-Use this production setup:
+- Browser-based microphone recording and audio upload
+- Whisper-powered speech transcription
+- Text similarity comparison between expected and spoken output
+- Phoneme extraction and comparison using CMUdict
+- Pronunciation score and grade generation
+- Human-readable coaching feedback
+- Session-based progress history
+- Production deployment with Vercel for the frontend and Render for the backend
 
-- Backend -> Render
-- Frontend -> Vercel
+## Demo
 
-Deploy order:
-
-1. deploy backend on Render
-2. copy backend URL
-3. deploy frontend on Vercel
-4. set `VITE_API_BASE_URL` to the Render backend URL
-5. set backend `CORS_ORIGINS` to the Vercel frontend URL
-
----
+![SpeakRightAI Demo](./SpeakrightAi.jpeg)
 
 ## Architecture
 
@@ -40,96 +39,162 @@ Deploy order:
 flowchart LR
     A["User"] --> B["React Frontend<br/>Vercel"]
     B -->|POST audio + expected_text + session_id| C["FastAPI Backend<br/>Render"]
-    C --> D["Whisper"]
-    C --> E["Phoneme Analysis"]
+    C --> D["Whisper ASR"]
+    C --> E["NLTK CMUdict<br/>Phoneme Analysis"]
     C --> F["Scoring + Feedback"]
     F --> B
 ```
 
-Request flow:
+Production deployment:
 
-1. user records or uploads audio
-2. frontend sends audio to backend
-3. backend transcribes audio with Whisper
-4. backend compares text and phonemes
-5. backend returns score, grade, feedback, and history
-6. frontend displays results
-
----
-
-## Stack
-
-### Frontend
-
-- React
-- Vite
-- Tailwind CSS
-- Framer Motion
-
-### Backend
-
-- FastAPI
-- Uvicorn
-- OpenAI Whisper
-- PyTorch
-- NLTK CMUdict
-- FFmpeg
-
----
-
-## Local Run
-
-### Backend
-
-```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install --upgrade pip
-pip install -r requirements.txt
-python -m nltk.downloader cmudict
-uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```text
+Vercel Frontend -> Render Backend -> Whisper + Phoneme Engine
 ```
 
-Backend URLs:
+## How It Works
 
-- API: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- Docs: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
-- Health: [http://127.0.0.1:8000/health](http://127.0.0.1:8000/health)
+```text
+Audio Input
+    |
+    v
+Whisper Transcription
+    |
+    v
+Phoneme Extraction
+    |
+    v
+Phoneme Comparison + Scoring
+    |
+    v
+Score + Feedback -> Frontend
+```
 
-Important:
+## Tech Stack
 
-- `ffmpeg` must be installed and available in PATH
-- use a clean virtual environment on Windows
+| Layer | Technology |
+|---|---|
+| Frontend | React, Vite, Tailwind CSS, Framer Motion |
+| Backend | FastAPI, Python 3.10, Uvicorn |
+| Speech Recognition | OpenAI Whisper |
+| Phoneme Analysis | NLTK CMU Pronouncing Dictionary |
+| Audio Processing | FFmpeg |
+| Configuration | Pydantic Settings |
+| Containerization | Docker, Docker Compose |
+| Backend Hosting | Render |
+| Frontend Hosting | Vercel |
+
+## Project Structure
+
+```text
+speakrightAI/
+|-- app/
+|   |-- main.py
+|   |-- api/routes/
+|   |-- core/
+|   |-- models/
+|   `-- services/
+|-- frontend/
+|   |-- src/
+|   |-- package.json
+|   `-- Dockerfile
+|-- Dockerfile.backend
+|-- docker-compose.yml
+|-- render.yaml
+|-- requirements.txt
+`-- .env.example
+```
+
+## Local Setup
+
+### Prerequisites
+
+- Python 3.10+
+- Node.js 18+
+- FFmpeg available on PATH
+- Git
+
+### Backend
+
+```bash
+git clone https://github.com/RR-1902/speakrightAI.git
+cd speakrightAI
+python -m venv venv
+```
+
+Activate the environment:
+
+```bash
+# Windows
+venv\Scripts\activate
+
+# macOS/Linux
+source venv/bin/activate
+```
+
+Install dependencies and start the API:
+
+```bash
+pip install -r requirements.txt
+python -m nltk.downloader cmudict
+uvicorn app.main:app --reload --port 8000
+```
+
+Backend checks:
+
+- `http://localhost:8000/health`
+- `http://localhost:8000/docs`
 
 ### Frontend
 
+```bash
+cd frontend
+npm install
+```
+
+Create `frontend/.env.local`:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
+```
+
+Start the frontend:
 
 ```bash
-npm install
 npm run dev
 ```
 
-Frontend URL:
+Frontend runs at:
 
-- App: [http://127.0.0.1:5173](http://127.0.0.1:5173)
+- `http://localhost:5173`
 
----
+## Docker
+
+Run the full stack locally:
+
+```bash
+docker compose up --build
+```
+
+| Service | URL |
+|---|---|
+| Frontend | `http://localhost:5173` |
+| Backend Docs | `http://localhost:8000/docs` |
 
 ## Environment Variables
 
 ### Backend
 
-Supported:
+| Variable | Default | Description |
+|---|---|---|
+| `APP_ENV` | `development` | Application environment |
+| `WHISPER_MODEL` | `tiny` | Whisper model size |
+| `WHISPER_DEVICE` | `cpu` | PyTorch inference device |
+| `MAX_UPLOAD_SIZE_MB` | `25` | Maximum audio upload size |
+| `CORS_ORIGINS` | required | Comma-separated allowed frontend origins |
 
-- `APP_ENV`
-- `WHISPER_MODEL`
-- `WHISPER_DEVICE`
-- `MAX_UPLOAD_SIZE_MB`
-- `CORS_ORIGINS`
+Production example:
 
-Example:
-
-```bash
+```env
 APP_ENV=production
 WHISPER_MODEL=tiny
 WHISPER_DEVICE=cpu
@@ -139,105 +204,141 @@ CORS_ORIGINS=https://speakright-ai.vercel.app
 
 ### Frontend
 
-```bash
+| Variable | Description |
+|---|---|
+| `VITE_API_BASE_URL` | Backend API URL without a trailing slash |
+
+Production value:
+
+```env
 VITE_API_BASE_URL=https://speakrightai.onrender.com
 ```
 
----
+## Deployment
 
+Important: deploy the backend to Render, not Vercel or Netlify serverless. Whisper, PyTorch, FFmpeg, and audio processing are too heavy for a simple serverless-first backend deployment.
 
-Official docs:
+### Backend -> Render
 
-- [Render Web Services](https://render.com/docs/web-services/)
-- [Render Docker](https://render.com/docs/docker)
+1. Open [Render](https://render.com)
+2. Create a new Web Service
+3. Connect the GitHub repository `RR-1902/speakrightAI`
+4. Use the following settings:
 
-Official docs:
+| Field | Value |
+|---|---|
+| Name | `speakrightai-backend` |
+| Runtime | Docker |
+| Branch | `main` |
+| Root Directory | leave empty |
+| Dockerfile Path | `Dockerfile.backend` |
+| Build Command | leave empty |
+| Start Command | leave empty |
+| Health Check Path | `/health` |
 
-- [Vite on Vercel](https://vercel.com/docs/frameworks/frontend/vite)
-- [Vercel Environment Variables](https://vercel.com/docs/projects/environment-variables)
+5. Add environment variables:
 
+```env
+APP_ENV=production
+WHISPER_MODEL=tiny
+WHISPER_DEVICE=cpu
+MAX_UPLOAD_SIZE_MB=25
+CORS_ORIGINS=https://speakright-ai.vercel.app
+```
 
-## Common Deployment Issues
+6. Deploy
+7. Verify:
+   - `https://speakrightai.onrender.com/health`
+   - `https://speakrightai.onrender.com/docs`
 
-### 1. Frontend loads but API calls fail
+### Frontend -> Vercel
 
-Check:
+1. Open [Vercel](https://vercel.com)
+2. Import the GitHub repository `RR-1902/speakrightAI`
+3. Use the following settings:
 
-- `VITE_API_BASE_URL` is correct in Vercel
-- backend is awake on Render
-- `CORS_ORIGINS` matches the Vercel domain exactly
+| Field | Value |
+|---|---|
+| Root Directory | `frontend` |
+| Framework Preset | Vite |
+| Build Command | `npm run build` |
+| Output Directory | `dist` |
 
-### 2. Render deploy succeeds but backend does not respond
+4. Add environment variable:
 
-Check:
+```env
+VITE_API_BASE_URL=https://speakrightai.onrender.com
+```
 
-- `/health` works
-- Render logs show Uvicorn started
-- `Dockerfile.backend` is being used
+5. Deploy
 
-### 3. CORS error in browser
+## API Reference
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/health` | Health check |
+| `POST` | `/api/v1/speech/transcribe` | Upload audio and receive transcription, score, feedback, and phoneme analysis |
+
+Interactive API docs are available at:
+
+- [https://speakrightai.onrender.com/docs](https://speakrightai.onrender.com/docs)
+
+## Known Issues & Fixes
+
+### Windows PyTorch DLL Load Failure
+
+```text
+OSError: [WinError 1114] A dynamic link library initialization routine failed.
+```
 
 Fix:
 
-- set backend `CORS_ORIGINS=https://speakright-ai.vercel.app`
-- redeploy backend
+1. recreate the virtual environment
+2. reinstall dependencies cleanly
+3. install the Microsoft Visual C++ Redistributable
 
-### 4. Whisper is slow on first request
+This is a local Windows issue. Docker on Render avoids it.
 
-This is normal on cold start, especially on free hosting.
+### CORS Error After Deployment
 
----
+Cause:
 
-Run:
+- Render `CORS_ORIGINS` does not include the Vercel URL
 
-```bash
-docker compose up --build
+Fix:
+
+```env
+CORS_ORIGINS=https://speakright-ai.vercel.app
 ```
 
-Local Docker URLs:
+Then redeploy the backend.
 
-- frontend: [http://localhost:5173](http://localhost:5173)
-- backend: [http://localhost:8000](http://localhost:8000)
+### Render Port Binding
 
----
+Render assigns `$PORT` dynamically. The backend Dockerfile already handles it:
 
-## API
-
-### Endpoints
-
-- `GET /health`
-- `POST /api/v1/speech/transcribe`
-
-### Request fields
-
-- `file`
-- `expected_text`
-- `session_id`
-
-### Example cURL
-
-```bash
-curl -X POST "http://127.0.0.1:8000/api/v1/speech/transcribe" \
-  -F "file=@sample.wav" \
-  -F "expected_text=Hello and welcome to SpeakRightAI" \
-  -F "session_id=demo-session-1"
+```dockerfile
+CMD ["/bin/sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]
 ```
-
----
 
 ## Current Limitations
 
-- session tracking is in memory only
-- Whisper cold starts can be slow
+- Progress is stored in memory and resets on server restart
+- Whisper cold starts can be slow on free hosting
 - CPU inference is slower than GPU inference
-- large audio files take longer to process
+- Larger audio files take longer to process
 
----
+## Future Improvements
 
-## Next Improvements
+- Persistent progress storage
+- Real-time streaming feedback
+- Multi-language pronunciation support
+- AI-generated voice correction
+- Authentication
+- Mobile app support
 
-1. move session history to a database
-2. add authentication
-3. store audio in cloud storage
-4. add background jobs
-5. add custom domains
+## Author
+
+Rohith Rajan
+
+Full-Stack and AI Systems Developer
